@@ -1,0 +1,70 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 2
+  tags:
+  - RoadTilemap
+  - RambuKiri
+  - RambuKanan
+  - RambuLurus
+  - Rambu30
+  - Rambu60
+  - Rambu90
+  - RambuAkhir
+  - RambuVerboden
+  - Transport
+  - LevelEditor
+  - Explosion
+  - Lantai
+  - Kendaraan
+  - Rambu
+  - DecorTilemap
+  - SelectedTileTilemap
+  - LevelTemplate
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - 
+  - Water
+  - UI
+  - UI Blocker
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  m_SortingLayers:
+  - name: BG
+    uniqueID: 4154894667
+    locked: 0
+  - name: Default
+    uniqueID: 0
+    locked: 0
+  - name: Tilemap
+    uniqueID: 3603479629
+    locked: 0
+  - name: Transportations
+    uniqueID: 2863603857
+    locked: 0
