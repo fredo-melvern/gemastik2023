@@ -42,12 +42,16 @@ public class Car : MonoBehaviour
         tilemap = GameObject.FindWithTag("RoadTilemap").GetComponent<Tilemap>();
         speed = defaultSpeed;
 
-        // snap position
-        rb.position = tilemap.CellToWorld(tilemap.WorldToCell(rb.position));
+        
 
         SetDirection(direction);
         targetCell = tilemap.WorldToCell(rb.position) + direction;
 
+    }
+    private void Start()
+    {
+        // snap position
+        rb.position = tilemap.CellToWorld(tilemap.WorldToCell(rb.position));
     }
 
 
@@ -65,7 +69,10 @@ public class Car : MonoBehaviour
             if (Vector3.Distance(rb.position, tilemap.CellToWorld(targetCell)) != 0)
             {
                 // lanjut jalan
-                transform.position = Vector3.MoveTowards(rb.position, tilemap.CellToWorld(targetCell), speed * Time.deltaTime);
+                rb.position = Vector3.MoveTowards(rb.position, tilemap.CellToWorld(targetCell), speed * Time.deltaTime);
+
+                // tes
+                //Debug.Log(tilemap.WorldToCell(rb.position) + "to" + targetCell);
 
                 // cek if targetCellnya tidak ada road
                 if (!tilemap.HasTile(targetCell) && Vector3.Distance(rb.position, tilemap.CellToWorld(targetCell)) < 0.3f)
@@ -75,6 +82,8 @@ public class Car : MonoBehaviour
             }
             else
             {
+                // smap pos
+                rb.position = tilemap.CellToWorld(tilemap.WorldToCell(rb.position));
 
                 Vector3Int kirinya = new Vector3Int(-direction.y, direction.x, direction.z);
                 Vector3Int kanannya = new Vector3Int(direction.y, -direction.x, direction.z);
@@ -109,7 +118,7 @@ public class Car : MonoBehaviour
 
                     if (cabangCount == 1)
                     {
-
+                        Destroy(gameObject);
                     }
                     else if (cabangCount > 2 && indicatorRenderer.sprite != null)
                     {
@@ -155,6 +164,7 @@ public class Car : MonoBehaviour
 
 
                 targetCell = targetCell + direction;
+
                 UpdateSpriteRotation();
 
             }
@@ -260,6 +270,9 @@ public class Car : MonoBehaviour
     }
     public void SetDirection(Vector3Int dir)
     {
+        // snap position
+        rb.position = tilemap.CellToWorld(tilemap.WorldToCell(rb.position));
+
         direction = dir;
         targetCell = tilemap.WorldToCell(rb.position) + direction;
         UpdateSpriteRotation();

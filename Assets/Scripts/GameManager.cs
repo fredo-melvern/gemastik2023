@@ -18,6 +18,8 @@ public class GameManager : MonoBehaviour
     Tilemap selectedTileTilemap;
     Tilemap decorTilemap;
     Tilemap roadTilemap;
+    GameObject tutorial;
+    GameObject win;
 
     public Tile selectedTile;
     public RuleTile roadTile;
@@ -33,7 +35,7 @@ public class GameManager : MonoBehaviour
     public float handToolSensitivity = 0.005f;
     public bool eraseRambuOnly;
 
-
+    public int currentLevel = 1;
     public bool isSimulating;
     //public GameObject transportations;
 
@@ -62,17 +64,36 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
+        if (SceneManage.GetInstance() != null)
+        {
+            currentLevel = SceneManage.GetLevel();
+            Debug.Log("current level is " + currentLevel);
+        }
         selectedTileTilemap = GameObject.FindWithTag("SelectedTileTilemap").GetComponent<Tilemap>();
-        Begin(1);
+        levelEditors = GameObject.FindGameObjectsWithTag("LevelEditor");
+
+        tutorial = GameObject.FindWithTag("Tutorial");
+        SetTutorial(false);
+
+        win = GameObject.FindWithTag("Win");
+        
+        Begin();
 
     }
-    void Begin(int level)
+    void Begin()
     {
-        StartCoroutine(Beginn(level));
+        StartCoroutine(Beginn(currentLevel));
+    }
+    public void NextLevel()
+    {
+        currentLevel++;
+        StartCoroutine(Beginn(currentLevel));
     }
 
     IEnumerator Beginn(int level)
     {
+        
+
         if (eraseRambuOnly)
         {
             // destroy existing level
@@ -89,9 +110,20 @@ public class GameManager : MonoBehaviour
             DestroyAllWithTag("RambuAkhir");
             DestroyAllWithTag("RambuVerboden");*/
 
-            // instantiate new level
+            
             yield return new WaitForEndOfFrame();
-            Instantiate(levelTemplates[level - 1]);
+
+            // instantiate new level
+            if (level-1 < levelTemplates.Length)
+            {
+                Instantiate(levelTemplates[level - 1], transform.position, Quaternion.identity);
+            }
+            else
+            {
+                Debug.Log(level.ToString() + " is over");
+                SceneManage.ChangeScene("LevelSelect");
+            }
+            
         }
 
         yield return new WaitForEndOfFrame();
@@ -99,12 +131,17 @@ public class GameManager : MonoBehaviour
         roadTilemap = GameObject.FindWithTag("RoadTilemap").GetComponent<Tilemap>();
         decorTilemap = GameObject.FindWithTag("DecorTilemap").GetComponent<Tilemap>();
         
-        levelEditors = GameObject.FindGameObjectsWithTag("LevelEditor");
-
+        
+        win.SetActive(false);
         editType = 4;
         rambu = null;
         decorTile = null;
         UpdateTab("Rambu");
+
+
+
+        isSimulating = false;
+        ShowAllEditor();
     }
 
 
@@ -112,6 +149,12 @@ public class GameManager : MonoBehaviour
     {
     if (roadTilemap != null)
     {
+            // toggle tutorial off when clicked
+            if (Input.GetMouseButtonDown(0))
+            {
+                SetTutorial(false);
+            }
+
             // select tile when mouse over
             Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             Vector3Int mouseCell = selectedTileTilemap.WorldToCell(mousePos);
@@ -232,7 +275,12 @@ public class GameManager : MonoBehaviour
                     EraseTransportAt(mouseCell);
                 }
             }
-        }
+
+            if (GameObject.FindGameObjectsWithTag("Transport").Length == 0 && isSimulating)
+            {
+                win.SetActive(true);
+            }
+    }
     }
     public void PlaceRambu()
     {
@@ -312,6 +360,7 @@ public class GameManager : MonoBehaviour
             transportMemories.Add(tm);
             
         }
+        LoadMemory();
 
         // Disable all level editors button
         editType = 4;
@@ -325,6 +374,15 @@ public class GameManager : MonoBehaviour
     {
         isSimulating = false;
 
+
+        // Load Memory
+        LoadMemory();
+
+        // enable all level editors button
+        ShowAllEditor();
+    }
+    void LoadMemory()
+    {
         // Destroy all transport
         GameObject[] transports = GameObject.FindGameObjectsWithTag("Transport");
         for (int i = 0; i < transports.Length; i++)
@@ -335,17 +393,19 @@ public class GameManager : MonoBehaviour
         // Spawn all transport
         for (int i = 0; i < transportMemories.Count; i++)
         {
-            GameObject prefab = transportMemories[i].prefab;
+            //GameObject prefab = transportMemories[i].prefab;
             Vector3Int direction = transportMemories[i].direction;
             Vector3 pos = transportMemories[i].pos;
 
             GameObject newTransport = Instantiate(transportMemories[i].prefab, pos, Quaternion.identity);
+            //newTransport.GetComponent<Car>().direction = direction;
             newTransport.GetComponent<Car>().SetDirection(direction);
             newTransport.transform.SetParent(GameObject.FindWithTag("LevelTemplate").transform);
-            
-        }
 
-        // enable all level editors button
+        }
+    }
+    void ShowAllEditor()
+    {
         editType = 4;
         for (int i = 0; i < levelEditors.Length; i++)
         {
@@ -431,5 +491,13 @@ public class GameManager : MonoBehaviour
         {
             Destroy(objects[i]);
         }
+    }
+    public void SetTutorial(bool toggl)
+    {
+        if (eraseRambuOnly)
+        {
+            tutorial.SetActive(toggl);
+        }
+        
     }
 }

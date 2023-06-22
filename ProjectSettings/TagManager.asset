@@ -22,6 +22,8 @@ TagManager:
   - DecorTilemap
   - SelectedTileTilemap
   - LevelTemplate
+  - Tutorial
+  - Win
   layers:
   - Default
   - TransparentFX
